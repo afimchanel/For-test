@@ -12,11 +12,6 @@ const getUser = catchAsync(async (req, res, next) => {
     return res.status(200).json({ 'statusCode': 200, 'data': user })
 })
 
-const updateProject = catchAsync(async (req, res, next) => {
-
-
-    return res.status(200).json({ 'statusCode': 201, 'data': 'result' })
-})
 
 const registerUser = catchAsync(async (req, res, next) => {
 
@@ -43,7 +38,7 @@ const loginUser = catchAsync(async (req, res, next) => {
     }
     const payload = {
         sub: user._id,
-        iat: new Date().getTime()
+        expire: new Date().getTime() //+ count day
     };
     
     return res.status(200).json({ 'statusCode': 200, 'message': 'success', 'data': {username:user.username},"token":jwt.sign(payload, process.env.JWT_SECRET_KEY), })

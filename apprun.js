@@ -5,33 +5,35 @@ const passport = require('passport');
 jwt = require('jsonwebtoken');
 
 app.use(express.json());
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({ extended: true }))
 
-app.use(session({ secret: 'keyboard cat' })); 
+app.use(session({ secret: 'keyboard cat' }));
 app.use(passport.initialize());
 app.use(passport.session());
 
 
 const { Users } = require('./src/config/connectDB')
-requireJWTAuth = passport.authenticate("jwt",{session:false});
+requireJWTAuth = passport.authenticate("jwt", { session: false });
 ExtractJwt = require("passport-jwt").ExtractJwt;
 JwtStrategy = require("passport-jwt").Strategy;
 passport.use(new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET_KEY
-},async (payload, cb) => {
+}, async (payload, cb) => {
     u = await Users.findById(payload.sub).select('-password')
-    cb(null,u)
+    cb(null, u)
 }));
 
 const usersRoute = require('./src/routes/users')
+const meetingRoute = require('./src/routes/meeting')
 
 
-app.use('/api/user',requireJWTAuth,usersRoute )
+app.use('/api/user', requireJWTAuth, usersRoute)
+app.use('/api/meeting', requireJWTAuth, meetingRoute)
 
 
 app.all('*', (req, res, next) => {
-    return res.status(404).json({'message' :  req.originalUrl + ' not fount page'});
+    return res.status(404).json({ 'message': req.originalUrl + ' not fount page' });
 });
 
 
